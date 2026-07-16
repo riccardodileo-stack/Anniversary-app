@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#c790d8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Our Journey">
+  <meta name="description" content="Il nostro diario di viaggio, fatto di luoghi, ricordi e piccoli momenti insieme.">
+  <title>Our Journey</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preconnect" href="https://tile.openstreetmap.org">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <link rel="stylesheet" href="./style.css">
+
+  <!-- Icona provvisoria incorporata: potrai sostituirla con icon-192.png e icon-512.png. -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='44' fill='%23c790d8'/%3E%3Cpath d='M96 148S36 116 36 72c0-30 38-41 60-14 22-27 60-16 60 14 0 44-60 76-60 76Z' fill='white'/%3E%3C/svg%3E">
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+
+  <div id="app" class="app-shell">
+    <header class="topbar">
+      <button class="brand-button" id="brandButton" type="button" aria-label="Torna alla mappa">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 20.2S3.2 15.4 3.2 8.9A4.7 4.7 0 0 1 12 6.4a4.7 4.7 0 0 1 8.8 2.5c0 6.5-8.8 11.3-8.8 11.3Z"/></svg>
+        </span>
+        <span>
+          <strong id="headerTitle">Our Journey</strong>
+          <small id="headerSubtitle">il nostro mondo, insieme</small>
+        </span>
+      </button>
+      <div class="header-actions">
+        <span class="connection-pill" id="connectionPill" title="Stato connessione">
+          <i></i><span>Online</span>
+        </span>
+        <button class="icon-button" id="quickAddButton" type="button" aria-label="Aggiungi una meta">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section class="view is-active" id="view-map" data-view="map" aria-labelledby="mapTitle">
+        <div class="hero-card">
+          <div class="hero-copy">
+            <span class="eyebrow">La nostra storia nel mondo</span>
+            <h1 id="mapTitle">Ogni luogo ha un pezzetto di noi.</h1>
+            <p id="anniversaryMessage">Segna le città, conserva le foto e rivivi i vostri momenti più belli.</p>
+          </div>
+          <div class="hero-heart" aria-hidden="true">
+            <span>♡</span>
+            <i class="orbit-dot dot-one"></i>
+            <i class="orbit-dot dot-two"></i>
+          </div>
+          <div class="hero-metrics" id="heroMetrics"></div>
+        </div>
+
+        <div class="search-card">
+          <form class="place-search" id="placeSearchForm" autocomplete="off">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+            <input id="placeSearchInput" type="search" placeholder="Cerca una città o un paese…" aria-label="Cerca una città o un paese">
+            <button type="submit">Cerca</button>
+          </form>
+          <div class="search-suggestions" id="searchSuggestions" hidden></div>
+        </div>
+
+        <div class="map-card">
+          <div class="map-toolbar">
+            <div>
+              <span class="section-kicker">La nostra mappa</span>
+              <h2>Destinazioni</h2>
+            </div>
+            <button class="soft-button compact" id="locateButton" type="button">
+              <svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="5"/></svg>
+              La mia posizione
+            </button>
+          </div>
+
+          <div class="map-wrap">
+            <div id="map" aria-label="Mappa interattiva dei viaggi"></div>
+            <div class="offline-map" id="offlineMap" hidden>
+              <div class="world-shape" aria-hidden="true">
+                <span class="land land-a"></span><span class="land land-b"></span><span class="land land-c"></span>
+              </div>
+              <div class="offline-copy">
+                <strong>La mappa è in modalità offline</strong>
+                <span>Le mete salvate restano sempre disponibili qui sotto.</span>
+              </div>
+              <div class="offline-places" id="offlinePlaces"></div>
+            </div>
+            <button class="map-hint" id="mapHint" type="button">Tocca un punto della mappa per aggiungerlo</button>
+          </div>
+
+          <div class="legend" aria-label="Legenda della mappa">
+            <span><i class="visited"></i> Visitato</span>
+            <span><i class="visiting"></i> In visita</span>
+            <span><i class="planned"></i> Futuro viaggio</span>
+          </div>
+        </div>
+
+        <section class="section-block">
+          <div class="section-heading">
+            <div><span class="section-kicker">Ultimi ricordi</span><h2>Le nostre mete</h2></div>
+            <button class="text-button" id="showAllPlacesButton" type="button">Vedi tutte</button>
+          </div>
+          <div class="horizontal-list" id="recentPlaces"></div>
+        </section>
+      </section>
+
+      <section class="view" id="view-ratings" data-view="ratings" aria-labelledby="ratingsTitle">
+        <div class="page-heading">
+          <span class="eyebrow">Le nostre preferite</span>
+          <h1 id="ratingsTitle">Valutazioni</h1>
+          <p>Voti, ricordi, ristoranti del cuore e monumenti che non vogliamo dimenticare.</p>
+        </div>
+        <div class="filter-row" id="ratingFilters" role="group" aria-label="Filtra i viaggi">
+          <button class="filter-chip is-active" type="button" data-filter="all">Tutti</button>
+          <button class="filter-chip" type="button" data-filter="rated">Valutati</button>
+          <button class="filter-chip" type="button" data-filter="unrated">Da valutare</button>
+        </div>
+        <div class="stack-list" id="ratingsList"></div>
+      </section>
+
+      <section class="view" id="view-stats" data-view="stats" aria-labelledby="statsTitle">
+        <div class="page-heading stats-heading">
+          <div>
+            <span class="eyebrow">Il nostro passaporto</span>
+            <h1 id="statsTitle">Statistiche di viaggio</h1>
+            <p>Un piccolo atlante di tutto quello che abbiamo vissuto insieme.</p>
+          </div>
+          <label class="year-picker">
+            <span>Anno</span>
+            <select id="statsYear" aria-label="Seleziona anno"></select>
+          </label>
+        </div>
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <div class="insight-card top-destinations-card">
+          <div class="section-heading">
+            <div><span class="section-kicker">La classifica del cuore</span><h2>Top 3 mete</h2></div>
+            <span class="mini-badge">media dei voti</span>
+          </div>
+          <div class="podium" id="topDestinations"></div>
+        </div>
+
+        <div class="insight-card">
+          <div class="section-heading">
+            <div><span class="section-kicker">Continenti</span><h2>Il nostro passaporto</h2></div>
+          </div>
+          <div class="continent-list" id="continentStats"></div>
+        </div>
+
+        <div class="insight-card">
+          <div class="section-heading">
+            <div><span class="section-kicker">Il viaggio continua</span><h2>Timeline dei ricordi</h2></div>
+          </div>
+          <div class="timeline" id="travelTimeline"></div>
+        </div>
+      </section>
+
+      <section class="view" id="view-planned" data-view="planned" aria-labelledby="plannedTitle">
+        <div class="page-heading split-heading">
+          <div>
+            <span class="eyebrow">Prossime avventure</span>
+            <h1 id="plannedTitle">Viaggi programmati</h1>
+            <p>Idee, date e desideri per il prossimo posto da scoprire insieme.</p>
+          </div>
+          <button class="primary-button round-mobile" id="addPlannedButton" type="button">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            <span>Nuovo viaggio</span>
+          </button>
+        </div>
+        <div class="next-trip-card" id="nextTripCard"></div>
+        <div class="stack-list planned-list" id="plannedList"></div>
+        <div class="dream-card">
+          <span class="dream-icon">✦</span>
+          <div><strong>La lista dei sogni</strong><p>Salva anche una meta senza date: sarà il vostro prossimo “prima o poi”.</p></div>
+          <button type="button" id="addDreamButton">Aggiungi</button>
+        </div>
+      </section>
+
+      <section class="view" id="view-settings" data-view="settings" aria-labelledby="settingsTitle">
+        <div class="page-heading">
+          <span class="eyebrow">Rendila vostra</span>
+          <h1 id="settingsTitle">Impostazioni</h1>
+          <p>Personalizza il diario e custodisci una copia di tutti i ricordi.</p>
+        </div>
+
+        <div class="settings-card profile-settings">
+          <div class="settings-title"><span class="settings-icon lilac">♡</span><div><strong>La nostra app</strong><small>Nomi, data e dedica iniziale</small></div></div>
+          <div class="form-grid two-columns">
+            <label><span>Il tuo nome</span><input id="settingNameOne" type="text" maxlength="30" placeholder="Il tuo nome"></label>
+            <label><span>Il suo nome</span><input id="settingNameTwo" type="text" maxlength="30" placeholder="Il suo nome"></label>
+            <label><span>Data dell’anniversario</span><input id="settingAnniversary" type="date"></label>
+            <label><span>Titolo dell’app</span><input id="settingAppTitle" type="text" maxlength="32" placeholder="Our Journey"></label>
+          </div>
+          <label class="full-label"><span>Dedica</span><textarea id="settingDedication" rows="3" maxlength="180" placeholder="Ogni luogo ha un pezzetto di noi."></textarea></label>
+          <button class="primary-button full-width" id="saveSettingsButton" type="button">Salva personalizzazione</button>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-title"><span class="settings-icon sky">◐</span><div><strong>Aspetto</strong><small>Scegli il colore e la luminosità</small></div></div>
+          <div class="theme-options" id="accentOptions" role="radiogroup" aria-label="Colore principale">
+            <button type="button" data-accent="lilac" class="accent-dot lilac is-active" aria-label="Lilla"></button>
+            <button type="button" data-accent="rose" class="accent-dot rose" aria-label="Rosa"></button>
+            <button type="button" data-accent="blue" class="accent-dot blue" aria-label="Azzurro"></button>
+            <button type="button" data-accent="sage" class="accent-dot sage" aria-label="Salvia"></button>
+          </div>
+          <div class="segmented-control" id="modeOptions" role="radiogroup" aria-label="Modalità colore">
+            <button type="button" data-mode="light" class="is-active">Chiaro</button>
+            <button type="button" data-mode="auto">Automatico</button>
+            <button type="button" data-mode="dark">Scuro</button>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-title"><span class="settings-icon peach">⇅</span><div><strong>I nostri dati</strong><small>Esporta o ripristina il diario</small></div></div>
+          <div class="settings-actions">
+            <button type="button" id="exportButton"><span>Esporta backup</span><small>Salva un file JSON con tutti i ricordi</small><i>›</i></button>
+            <button type="button" id="importButton"><span>Importa backup</span><small>Ripristina un backup precedente</small><i>›</i></button>
+            <button type="button" id="demoButton"><span>Aggiungi dati dimostrativi</span><small>Per vedere subito l’app in azione</small><i>›</i></button>
+            <button type="button" id="resetButton" class="danger-row"><span>Cancella tutti i dati</span><small>L’operazione non può essere annullata</small><i>›</i></button>
+          </div>
+          <input id="importFileInput" type="file" accept="application/json" hidden>
+        </div>
+
+        <div class="settings-card install-card">
+          <div class="settings-title"><span class="settings-icon green">↓</span><div><strong>Installa sul telefono</strong><small>Aprila come una vera app, anche offline</small></div></div>
+          <p>Su iPhone: apri la pagina in Safari, tocca <b>Condividi</b> e poi <b>Aggiungi alla schermata Home</b>.</p>
+          <button class="soft-button full-width" id="installButton" type="button">Installa l’app</button>
+        </div>
+
+        <p class="app-version">Our Journey · versione 1.0 · fatto con amore ♡</p>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Navigazione principale">
+      <button class="nav-item is-active" type="button" data-target="map" aria-current="page">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="m9 18-6 3V6l6-3 6 3 6-3v15l-6 3-6-3Z"/><path d="M9 3v15M15 6v15"/></svg></span><span>Mappa</span>
+      </button>
+      <button class="nav-item" type="button" data-target="ratings">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="m12 3 2.7 5.5 6 .9-4.3 4.2 1 6-5.4-2.9-5.4 2.9 1-6-4.3-4.2 6-.9L12 3Z"/></svg></span><span>Valutazioni</span>
+      </button>
+      <button class="nav-item" type="button" data-target="stats">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><span>Statistiche</span>
+      </button>
+      <button class="nav-item" type="button" data-target="planned">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg></span><span>Programmati</span>
+      </button>
+      <button class="nav-item" type="button" data-target="settings">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3V2.8h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></svg></span><span>Impostazioni</span>
+      </button>
+    </nav>
+  </div>
+
+  <div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
+  <section class="bottom-sheet" id="bottomSheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
+    <div class="sheet-handle" aria-hidden="true"></div>
+    <div class="sheet-header">
+      <div><span class="section-kicker" id="sheetKicker"></span><h2 id="sheetTitle"></h2><p id="sheetSubtitle"></p></div>
+      <button class="icon-button subtle" id="closeSheetButton" type="button" aria-label="Chiudi"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="sheet-content" id="sheetContent"></div>
+  </section>
+
+  <dialog class="modal-dialog" id="formDialog">
+    <form method="dialog" id="dynamicForm">
+      <div class="dialog-header">
+        <div><span class="section-kicker" id="formKicker"></span><h2 id="formTitle"></h2><p id="formSubtitle"></p></div>
+        <button class="icon-button subtle" id="dialogCloseButton" type="button" aria-label="Chiudi"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+      </div>
+      <div class="dialog-body" id="formBody"></div>
+      <div class="dialog-actions" id="formActions"></div>
+    </form>
+  </dialog>
+
+  <dialog class="photo-viewer" id="photoViewer">
+    <button class="viewer-close" id="closePhotoViewer" type="button" aria-label="Chiudi foto">×</button>
+    <img id="viewerImage" alt="Foto ricordo ingrandita">
+    <p id="viewerCaption"></p>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="./script.js"></script>
+</body>
+</html>
