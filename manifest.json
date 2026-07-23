@@ -1,7 +1,7 @@
 {
   "name": "Our Journey – Il nostro diario di viaggio",
   "short_name": "Our Journey",
-  "description": "Il nostro diario di viaggio, fatto di luoghi, ricordi, foto e piccoli momenti insieme.",
+  "description": "Il nostro diario di viaggio, fatto di luoghi, ricordi, foto e momenti insieme.",
   "lang": "it-IT",
   "start_url": "./index.html",
   "scope": "./",

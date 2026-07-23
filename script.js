@@ -65,7 +65,7 @@
       nameTwo: "",
       anniversary: "",
       appTitle: "Our Journey",
-      dedication: "Ogni luogo ha un pezzetto di noi.",
+      dedication: "Il nostro viaggio",
       accent: "lilac",
       mode: "light"
     },
@@ -726,7 +726,7 @@
     openDynamicForm({
       kicker: place.name,
       title: "Le nostre foto ricordo",
-      subtitle: "Aggiungi le foto di voi che ti piacciono di più. Puoi salvarne fino a 10 per ogni viaggio.",
+      subtitle: "Aggiungi le foto che ti piacciono di più. Puoi salvarne fino a 10 per ogni viaggio.",
       body: galleryBody(place),
       showSave: false
     });
@@ -736,7 +736,7 @@
   function galleryBody(place) {
     return `<label class="photo-upload ${place.photos.length >= 10 ? "disabled" : ""}">
       <input id="photoInput" type="file" accept="image/*" multiple ${place.photos.length >= 10 ? "disabled" : ""}>
-      <span class="empty-state-icon">＋</span><strong>${place.photos.length >= 10 ? "Hai raggiunto il massimo di 10 foto" : "Aggiungi le vostre foto più belle"}</strong><span>Le immagini vengono ottimizzate e salvate soltanto su questo dispositivo.</span>
+      <span class="empty-state-icon">＋</span><strong>${place.photos.length >= 10 ? "Hai raggiunto il massimo di 10 foto" : "Aggiungi le foto più belle"}</strong><span>Le immagini vengono ottimizzate e salvate soltanto su questo dispositivo.</span>
     </label>
     <div class="memory-gallery" id="memoryGallery">${place.photos.map((photo, index) => `<div class="memory-photo" data-photo-index="${index}"><img src="${photo.data}" alt="Ricordo ${index + 1} di ${escapeHTML(place.name)}"><button type="button" data-delete-photo="${index}" aria-label="Elimina foto">×</button></div>`).join("")}</div>
     ${place.photos.length ? `<p class="field-note">${place.photos.length}/10 foto · Tocca una foto per vederla a tutto schermo.</p>` : `<p class="field-note">La galleria è ancora vuota: scegli il primo ricordo da custodire qui.</p>`}`;
@@ -877,7 +877,7 @@
     ${place.notes ? `<div class="detail-box"><small>Il nostro ricordo</small><strong>${escapeHTML(place.notes)}</strong></div>` : ""}
     ${place.wish ? `<div class="detail-box"><small>Il nostro desiderio</small><strong>${escapeHTML(place.wish)}</strong></div>` : ""}
     <div class="collection-section"><h3>Le nostre valutazioni</h3><div class="detail-grid">${ratings}</div></div>
-    <div class="collection-section"><h3>Ristoranti del cuore</h3><div class="collection-list">${collectionItems(place.restaurants, "restaurant")}</div><div class="inline-add"><input id="restaurantName" placeholder="Nome ristorante"><input id="restaurantNote" placeholder="Piatto o ricordo preferito"><button type="button" data-add-collection="restaurant">＋</button></div></div>
+    <div class="collection-section"><h3>Ristoranti preferiti</h3><div class="collection-list">${collectionItems(place.restaurants, "restaurant")}</div><div class="inline-add"><input id="restaurantName" placeholder="Nome ristorante"><input id="restaurantNote" placeholder="Piatto o ricordo preferito"><button type="button" data-add-collection="restaurant">＋</button></div></div>
     <div class="collection-section"><h3>Monumenti e luoghi preferiti</h3><div class="collection-list">${collectionItems(place.monuments, "monument")}</div><div class="inline-add"><input id="monumentName" placeholder="Nome del luogo"><input id="monumentNote" placeholder="Perché vi è piaciuto"><button type="button" data-add-collection="monument">＋</button></div></div>
     <div class="form-row"><button type="button" class="soft-button" data-detail-action="edit">Modifica informazioni</button><button type="button" class="soft-button" data-detail-action="photos">Apri le foto</button></div>`;
   }
@@ -1003,7 +1003,7 @@
     const top = places.filter(place => averageRating(place.ratings)).sort((a, b) => averageRating(b.ratings) - averageRating(a.ratings)).slice(0, 3);
     const container = $("#topDestinations");
     if (!top.length) {
-      container.innerHTML = emptyState("☆", "La classifica aspetta i vostri voti", "Valuta almeno un viaggio per scoprire la vostra meta preferita.");
+      container.innerHTML = emptyState("☆", "La classifica aspetta i tuoi voti", "Valuta almeno un viaggio per scoprire la tua meta preferita.");
       return;
     }
     container.innerHTML = top.map((place, index) => `<div class="podium-place"><span class="podium-score">${averageRating(place.ratings).toFixed(1)} / 10</span><strong>${escapeHTML(place.name)}</strong><small>${escapeHTML(place.country || "")}</small><span class="podium-number">${index + 1}</span></div>`).join("");
@@ -1022,7 +1022,7 @@
     const container = $("#travelTimeline");
     const sorted = [...places].sort((a, b) => (b.dates?.start || b.createdAt).localeCompare(a.dates?.start || a.createdAt));
     if (!sorted.length) {
-      container.innerHTML = `<p class="field-note">La timeline inizierà con il vostro primo viaggio.</p>`;
+      container.innerHTML = `<p class="field-note">La timeline inizierà con il tuo primo viaggio.</p>`;
       return;
     }
     container.innerHTML = sorted.map(place => `<div class="timeline-item"><i class="timeline-dot"></i><strong>${escapeHTML(place.name)}</strong><span>${escapeHTML(formatDateRange(place))}${averageRating(place.ratings) ? ` · voto ${averageRating(place.ratings).toFixed(1)}` : ""}</span></div>`).join("") + (coupleAverage ? `<div class="timeline-item"><i class="timeline-dot"></i><strong>La media dei vostri viaggi</strong><span>${coupleAverage.toFixed(1)} su 10: niente male per due esploratori ♡</span></div>` : "");
@@ -1082,10 +1082,10 @@
     state.settings.nameTwo = $("#settingNameTwo").value.trim();
     state.settings.anniversary = $("#settingAnniversary").value;
     state.settings.appTitle = $("#settingAppTitle").value.trim() || "Our Journey";
-    state.settings.dedication = $("#settingDedication").value.trim() || "Ogni luogo ha un pezzetto di noi.";
+    state.settings.dedication = $("#settingDedication").value.trim() || "Il nostro viaggio";
     saveState();
     celebrate();
-    showToast("La vostra app è stata personalizzata.");
+    showToast("L'app è stata personalizzata.");
   }
 
   function handleAccentChange(event) {
