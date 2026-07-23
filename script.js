@@ -293,7 +293,7 @@
     const settings = state.settings;
     $("#headerTitle").textContent = settings.appTitle || "Our Journey";
     $("#headerSubtitle").textContent = settings.nameOne && settings.nameTwo
-      ? `${settings.nameOne} & ${settings.nameTwo}` : "il nostro mondo, insieme";
+      ? `${settings.nameOne} & ${settings.nameTwo}` : "Il nostro viaggio";
     document.title = settings.appTitle || "Our Journey";
   }
 
@@ -319,7 +319,7 @@
     const days = Math.ceil((next - today) / 86400000);
     const names = nameOne && nameTwo ? `${nameOne} & ${nameTwo}` : "Noi due";
     if (days === 0) return `Buon anniversario, ${names}! Oggi festeggiamo la nostra storia. ♡`;
-    return `${dedication || "Ogni luogo ha un pezzetto di noi."} Mancano ${days} giorni al prossimo anniversario.`;
+    return `${dedication || ""} Mancano ${days} giorni al prossimo anniversario.`;
   }
 
   function renderRecentPlaces() {

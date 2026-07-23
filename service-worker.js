@@ -1,6 +1,6 @@
-const APP_CACHE = "our-journey-shell-v3";
-const RUNTIME_CACHE = "our-journey-runtime-v3";
-const MAP_CACHE = "our-journey-map-v3";
+const APP_CACHE = "our-journey-shell-v4";
+const RUNTIME_CACHE = "our-journey-runtime-v4";
+const MAP_CACHE = "our-journey-map-v4";
 
 const APP_SHELL = [
   "./",
